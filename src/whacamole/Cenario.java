@@ -106,13 +106,21 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
             int directionY = rand.nextInt(1);
             if (directionX == 1) {
                 bolaX = (int) (xp + ea.population[i][1]);
+                if (bolaX > getWidth())
+                    bolaX = (int) (getWidth() - ea.population[i][1]);
             } else {
                 bolaX = (int) (xp - ea.population[i][1]);
+                if (bolaX < 0)
+                    bolaX = (int) ea.population[i][1];
             }
             if (directionY == 1) {
                 bolaY = (int) (yp + ea.population[i][2]);
+                if (bolaY > getHeight())
+                    bolaY = (int) (getHeight() - ea.population[i][1]);
             } else {
                 bolaY = (int) (yp - ea.population[i][2]);
+                if (bolaY < 0)
+                    bolaY = (int) ea.population[i][2];
             }
             System.out.println(bolaX + " " + bolaY);
             Thread.sleep(1000);
