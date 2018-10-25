@@ -22,6 +22,9 @@ public class EvolutionaryAlgorithm {
     private int Kd = 4;
     private int Ke = 8;
     
+    public int numberGenerations;
+    
+    
     public float[][] population;
     
     public float[] fitPopulation;
@@ -29,10 +32,12 @@ public class EvolutionaryAlgorithm {
     Random generator = new Random();
     
     
-    public EvolutionaryAlgorithm(int sizePopulation, int mutation)
+    public EvolutionaryAlgorithm(int sizePopulation, int mutation, int numberGenerations)
     {
         this.sizePopulation = sizePopulation;
         this.mutation = mutation;
+        this.numberGenerations = numberGenerations;
+        
         population = new float[sizePopulation][3];
         fitPopulation = new float[sizePopulation];
         firstPopulation();
@@ -56,9 +61,68 @@ public class EvolutionaryAlgorithm {
                         population[i][j] = generator.nextInt(400);
                         break;
                 }
-            }
-            
+            } 
         }
+    }
+    
+    public void calculateFitness(int cod, float distanceBefore, float distanceAfter)
+    {
+        float fit;
+        fitPopulation[cod] = (Kt * (1-population[cod][0])) + (Kd * distanceBefore) - (Ke * distanceAfter);
+        System.out.println("Fitness:  " + fitPopulation[cod]);
+    }
+    
+    public void bestChromosome()
+    {
+        int i;
+        
+        int fitIndex;
+        float fitValue;
+        fitIndex=-1;
+        fitValue=-1;
+        
+        for (i=0; i<fitPopulation.length; i++)
+        {
+            if (fitPopulation[i] > fitValue)
+            {
+                fitValue = fitPopulation[i];
+                fitIndex = i;
+            }
+        }
+        
+        mutation(fitIndex);
+    }
+    
+    private void mutation(int best)
+    {
+        int i,k;
+        for (i=1; i<population.length; i++)
+        {
+            if (i==best)
+                continue;
+            for (k=0; k<2; k++)
+            {
+                switch(k)
+                {
+                    case 0:
+                        population[i][k] = (float) (generator.nextFloat() * 3);
+                        break;
+                    case 1:
+                        population[i][k] = generator.nextInt(500);
+                        break;
+                    case 2:
+                        population[i][k] = generator.nextInt(400);
+                        break;
+                    default:
+                        break;
+                }  
+            }
+        }
+    }
+    
+    public static float distancePoint(float x1, float y1, float x2, float y2)
+    {
+        return (float) Math.sqrt((Math.pow(x2-x1,2) + Math.pow(y2-y1,2)));  
     }
     
     

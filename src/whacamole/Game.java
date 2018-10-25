@@ -24,6 +24,6 @@ public class Game extends JFrame{
          setLocationRelativeTo(null);
          tela = new Cenario();
          add(tela);
-         tela.match();
+         tela.matches();
      }
 }

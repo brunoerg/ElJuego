@@ -31,11 +31,13 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
     private Timer timer;
     
     private int xp, yp;
+    
+    private int cont = 0;
 
     
     JLabel mousePosition;
     
-    EvolutionaryAlgorithm ea = new EvolutionaryAlgorithm(5, 100);
+    EvolutionaryAlgorithm ea = new EvolutionaryAlgorithm(5, 100, 5);
       
     /**
      * Creates new form Cenario
@@ -48,6 +50,8 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
         bolaY = 350;
         xp = 445;
         yp = 350;
+        xp0 = 445;
+        yp0 = 350;
     }
     
     @Override
@@ -96,12 +100,14 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
         }*/
     }
     
-    public void match() throws InterruptedException 
+    public void matches() throws InterruptedException 
     {
         int i;
         Random rand = new Random();
         for (i=0; i<ea.population.length; i++)
         {
+            xp0 = xp;
+            yp0 = yp;
             int directionX = rand.nextInt(1);
             int directionY = rand.nextInt(1);
             if (directionX == 1) {
@@ -123,9 +129,17 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
                     bolaY = (int) ea.population[i][2];
             }
             System.out.println(bolaX + " " + bolaY);
-            Thread.sleep(1000);
+            System.out.println("Time: " + ea.population[i][0]);
+            Thread.sleep((int)(1000 * ea.population[i][0]));
             repaint();
+            ea.calculateFitness(i, EvolutionaryAlgorithm.distancePoint(xp0, yp0, bolaX, bolaY), EvolutionaryAlgorithm.distancePoint(xp, yp, bolaX, bolaY));
         }
+        ea.bestChromosome();
+        if (cont < ea.numberGenerations) {
+            matches();
+            cont++;
+        }
+        
     }
     
     @Override
@@ -133,7 +147,6 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
         System.out.println("Mouse clicked at coordinate:" + "[" + e.getX() + "," + e.getY() + "]");
         xp = e.getX();
         yp = e.getY();
-        //match(e.getX(), e.getY(), 0.05);
     }
 
     @Override
