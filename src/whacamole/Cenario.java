@@ -32,12 +32,11 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
     
     private int xp, yp;
     
-    private int cont = 0;
-
+    private int cont = 1;
     
     JLabel mousePosition;
     
-    EvolutionaryAlgorithm ea = new EvolutionaryAlgorithm(5, 100, 5);
+    EvolutionaryAlgorithm ea = new EvolutionaryAlgorithm(5, 100, 3);
       
     /**
      * Creates new form Cenario
@@ -138,6 +137,8 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
         if (cont < ea.numberGenerations) {
             matches();
             cont++;
+        } else {
+            ea.printPontuation();
         }
         
     }

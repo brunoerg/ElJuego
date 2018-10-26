@@ -1,6 +1,7 @@
 package whacamole;
 
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /*
@@ -20,7 +21,7 @@ public class EvolutionaryAlgorithm {
     
     private int Kt = 2;
     private int Kd = 4;
-    private int Ke = 8;
+    private int Ke = 4;
     
     public int numberGenerations;
     
@@ -28,6 +29,8 @@ public class EvolutionaryAlgorithm {
     public float[][] population;
     
     public float[] fitPopulation;
+    
+    public ArrayList<Double> bPontuation = new ArrayList<Double>();
     
     Random generator = new Random();
     
@@ -40,6 +43,7 @@ public class EvolutionaryAlgorithm {
         
         population = new float[sizePopulation][3];
         fitPopulation = new float[sizePopulation];
+        
         firstPopulation();
     }
 
@@ -90,6 +94,7 @@ public class EvolutionaryAlgorithm {
             }
         }
         
+        bPontuation.add((double)fitValue);
         mutation(fitIndex);
     }
     
@@ -126,8 +131,15 @@ public class EvolutionaryAlgorithm {
     }
     
     
-    
-   
-    
+    public void printPontuation()
+    {
+        int i, k, pontuation;
+        pontuation = 0;
+        for (double pont : bPontuation)
+        {
+            pontuation += pont;
+        }
+        System.out.println("Final pontuation:  " + (pontuation / numberGenerations));
+    }
     
 }
