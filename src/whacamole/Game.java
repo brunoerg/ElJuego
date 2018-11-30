@@ -5,6 +5,7 @@
  */
 package whacamole;
 
+import java.io.IOException;
 import javax.swing.JFrame;
 
 /**
@@ -15,15 +16,18 @@ public class Game extends JFrame{
      
     Cenario tela;
     
-     public Game() throws InterruptedException
+     public Game() throws InterruptedException, IOException
      {
          super("El Juego - Whac a Mole + Evolutionary Algorithm");
-         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
          setSize(1000, 800);
          setVisible(true);
          setLocationRelativeTo(null);
          tela = new Cenario();
          add(tela);
-         tela.matches();
+         
+         this.revalidate();
+         this.repaint(); 
+         
      }
 }

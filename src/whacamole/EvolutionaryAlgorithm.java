@@ -1,7 +1,9 @@
 package whacamole;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /*
@@ -19,9 +21,9 @@ public class EvolutionaryAlgorithm {
     public int sizePopulation;
     public int mutation;
     
-    private int Kt = 2;
-    private int Kd = 4;
-    private int Ke = 4;
+    private int Kt = 8;
+    private int Kd = 8;
+    private int Ke = 2;
     
     public int numberGenerations;
     
@@ -30,12 +32,13 @@ public class EvolutionaryAlgorithm {
     
     public float[] fitPopulation;
     
-    public ArrayList<Double> bPontuation = new ArrayList<Double>();
+    ArrayList <Float> allFitness;
     
     Random generator = new Random();
     
+    Log log;
     
-    public EvolutionaryAlgorithm(int sizePopulation, int mutation, int numberGenerations)
+    public EvolutionaryAlgorithm(int sizePopulation, int mutation, int numberGenerations) throws IOException
     {
         this.sizePopulation = sizePopulation;
         this.mutation = mutation;
@@ -43,8 +46,26 @@ public class EvolutionaryAlgorithm {
         
         population = new float[sizePopulation][3];
         fitPopulation = new float[sizePopulation];
+        allFitness = new ArrayList<>();
         
+        log = new Log();
         firstPopulation();
+    }
+    
+    public void calculateFinalPontuation()
+    {
+        float allPont = 0;
+        int i;
+        
+        allPont = allFitness.stream().map((c) -> c).reduce(allPont, (accumulator, _item) -> accumulator + _item);
+        ElJuegoDAO dao = new ElJuegoDAO();
+        dao.cadastroPontuacao(allPont);
+        log.write("Final pontuation");
+        log.write("\r\n");
+        log.write(Float.toString(allPont));
+        log.write("\r\n");
+        System.out.println(allPont);
+       
     }
 
     private void firstPopulation()
@@ -74,12 +95,15 @@ public class EvolutionaryAlgorithm {
         float fit;
         fitPopulation[cod] = (Kt * (1-population[cod][0])) + (Kd * distanceBefore) - (Ke * distanceAfter);
         System.out.println("Fitness:  " + fitPopulation[cod]);
+        log.write("Fitness - ind: " + Integer.toString(cod));
+        log.write("\r\n");
+        log.write(Float.toString(fitPopulation[cod]));
+        log.write("\r\n");
     }
     
     public void bestChromosome()
     {
         int i;
-        
         int fitIndex;
         float fitValue;
         fitIndex=-1;
@@ -87,6 +111,7 @@ public class EvolutionaryAlgorithm {
         
         for (i=0; i<fitPopulation.length; i++)
         {
+            allFitness.add(fitPopulation[i]);
             if (fitPopulation[i] > fitValue)
             {
                 fitValue = fitPopulation[i];
@@ -94,7 +119,6 @@ public class EvolutionaryAlgorithm {
             }
         }
         
-        bPontuation.add((double)fitValue);
         mutation(fitIndex);
     }
     
@@ -123,23 +147,12 @@ public class EvolutionaryAlgorithm {
                 }  
             }
         }
+        System.out.println("New population realeased!");
     }
     
     public static float distancePoint(float x1, float y1, float x2, float y2)
     {
         return (float) Math.sqrt((Math.pow(x2-x1,2) + Math.pow(y2-y1,2)));  
-    }
-    
-    
-    public void printPontuation()
-    {
-        int i, k, pontuation;
-        pontuation = 0;
-        for (double pont : bPontuation)
-        {
-            pontuation += pont;
-        }
-        System.out.println("Final pontuation:  " + (pontuation / numberGenerations));
     }
     
 }

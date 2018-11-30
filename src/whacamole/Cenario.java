@@ -10,12 +10,16 @@ import java.awt.Graphics;
 import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 import sun.font.EAttribute;
@@ -24,33 +28,46 @@ import sun.font.EAttribute;
  *
  * @author Bruno Garcia
  */
-public class Cenario extends javax.swing.JPanel implements ActionListener, MouseListener, MouseMotionListener {
+public class Cenario extends javax.swing.JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
     
     private int bolaX, bolaY;
     private float xp0, yp0;
     private Timer timer;
+    Random rand; 
     
     private int xp, yp;
     
-    private int cont = 1;
+    private int cont = 0;
     
     JLabel mousePosition;
     
-    EvolutionaryAlgorithm ea = new EvolutionaryAlgorithm(5, 100, 3);
-      
+    EvolutionaryAlgorithm ea = new EvolutionaryAlgorithm(5, 100, 12);
+    
+    int i = 0;
+    int total = 0;
+    
+    Log log;
+    
+    Boolean flag = false;
     /**
      * Creates new form Cenario
      */
-    public Cenario() throws InterruptedException {
+    public Cenario() throws InterruptedException, IOException {
         initComponents();
         addMouseListener((MouseListener) this);
         setSize(1000,800);
+        setFocusable(true);
+        addKeyListener(this);
+        log = new Log();
         bolaX = 445;
         bolaY = 350;
         xp = 445;
         yp = 350;
         xp0 = 445;
         yp0 = 350;
+        timer = new Timer(1000/60,this);
+        timer.start();
+        rand = new Random();
     }
     
     @Override
@@ -61,6 +78,8 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
         g.setColor(Color.red);
         g.fillOval(bolaX, bolaY, 40, 40); 
     }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -83,71 +102,87 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    
     @Override
     public void actionPerformed(ActionEvent e) {
-        /*if(e.getSource() == timer)
-        {
-            
-            bolaX+=dx;
-            bolaY+=dy;
-            
-            if(bolaX<0||bolaX+30>getWidth())
-                dx=-dx;
-            if(bolaY<0||bolaY+30>getHeight())
-                dy=-dy;
-            repaint();
-        }*/
-    }
-    
-    public void matches() throws InterruptedException 
-    {
-        int i;
-        Random rand = new Random();
-        for (i=0; i<ea.population.length; i++)
-        {
-            xp0 = xp;
-            yp0 = yp;
-            int directionX = rand.nextInt(1);
-            int directionY = rand.nextInt(1);
-            if (directionX == 1) {
-                bolaX = (int) (xp + ea.population[i][1]);
-                if (bolaX > getWidth())
-                    bolaX = (int) (getWidth() - ea.population[i][1]);
-            } else {
-                bolaX = (int) (xp - ea.population[i][1]);
-                if (bolaX < 0)
-                    bolaX = (int) ea.population[i][1];
-            }
-            if (directionY == 1) {
-                bolaY = (int) (yp + ea.population[i][2]);
-                if (bolaY > getHeight())
-                    bolaY = (int) (getHeight() - ea.population[i][1]);
-            } else {
-                bolaY = (int) (yp - ea.population[i][2]);
-                if (bolaY < 0)
-                    bolaY = (int) ea.population[i][2];
-            }
-            System.out.println(bolaX + " " + bolaY);
-            System.out.println("Time: " + ea.population[i][0]);
-            Thread.sleep((int)(1000 * ea.population[i][0]));
-            repaint();
-            ea.calculateFitness(i, EvolutionaryAlgorithm.distancePoint(xp0, yp0, bolaX, bolaY), EvolutionaryAlgorithm.distancePoint(xp, yp, bolaX, bolaY));
-        }
-        ea.bestChromosome();
-        if (cont < ea.numberGenerations) {
-            matches();
-            cont++;
-        } else {
-            ea.printPontuation();
-        }
         
+            //refezer a logica envolvendo i e controle de populaçao
+            
+            if(e.getSource() == timer)
+            {
+                if (total == ea.numberGenerations)
+                {
+                    try {
+                        Thread.sleep((int)2000);
+                        if (flag == false)
+                        {
+                            ea.calculateFinalPontuation();
+                            Perfil p = new Perfil();
+                            p.show();
+                            flag = true;
+                        }  
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Cenario.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    //System.exit(0); 
+                } else if (i<4)
+                {
+                    xp0 = xp;
+                    yp0 = yp;
+                    log.write("Initial Player Position\r\n");
+                    log.write(Float.toString(xp0) + " ", Float.toString(yp0));
+                    log.write("\r\n");
+                    int directionX = rand.nextInt(1);
+                    int directionY = rand.nextInt(1);
+                    if (directionX == 1) {
+                        bolaX = (int) (xp + ea.population[i][1]);
+                        if (bolaX > getWidth())
+                            bolaX = (int) (getWidth() - ea.population[i][1]);
+                    } else {
+                        bolaX = (int) (xp - ea.population[i][1]);
+                        if (bolaX < 0)
+                            bolaX = (int) ea.population[i][1];
+                    }
+                    if (directionY == 1) {
+                        bolaY = (int) (yp + ea.population[i][2]);
+                        if (bolaY > getHeight())
+                            bolaY = (int) (getHeight() - ea.population[i][1]);
+                    } else {
+                        bolaY = (int) (yp - ea.population[i][2]);
+                        if (bolaY < 0)
+                            bolaY = (int) ea.population[i][2];
+                    }
+                    System.out.println(bolaX + " " + bolaY);
+                    log.write("Target position\r\n");
+                    log.write(Float.toString(bolaX) + " ", Float.toString(bolaY));
+                    log.write("\r\n");
+                    System.out.println("Time: " + ea.population[i][0]);
+                    try {
+                        Thread.sleep((int)(1000 * ea.population[i][0]));
+                    } catch (InterruptedException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                    repaint();
+                    ea.calculateFitness(i, EvolutionaryAlgorithm.distancePoint(xp0, yp0, bolaX, bolaY), EvolutionaryAlgorithm.distancePoint(xp, yp, bolaX, bolaY));
+                    i++;
+                    total++;
+                 } else {
+                    i=0;
+                    ea.bestChromosome();
+                }
+            }
     }
     
+
     @Override
     public void mouseClicked(MouseEvent e) {
         System.out.println("Mouse clicked at coordinate:" + "[" + e.getX() + "," + e.getY() + "]");
+        log.write("Mouse clicked");
+        log.write("\r\n");
         xp = e.getX();
         yp = e.getY();
+        log.write(Integer.toString(xp)+" ",Integer.toString(yp));
+        log.write("\r\n");
     }
 
     @Override
@@ -178,6 +213,20 @@ public class Cenario extends javax.swing.JPanel implements ActionListener, Mouse
     @Override
     public void mouseMoved(MouseEvent e) {
         
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+               
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 
 

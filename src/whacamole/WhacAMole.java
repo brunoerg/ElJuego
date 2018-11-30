@@ -15,8 +15,14 @@ public class WhacAMole {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws InterruptedException {
-        Game jogo;
-        jogo = new Game();
+        
+        /*Cadastrar cadastro;
+        cadastro = new Cadastrar();*/
+        
+        Inicio ini;
+        ini = new Inicio();
+        ini.show();
+        
     }
     
 }
